@@ -1,2 +1,6 @@
+#Depends on game play history in the local machine. Different for everyone.
 records.txt
+#Editor files
 *~
+#python cached code
+__pycache__

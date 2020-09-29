@@ -112,11 +112,12 @@ class ScoreBoard(pygame.sprite.Sprite):
         lines = [font_obj.render(message_str[i], True, (180, 20, 20)) for i in range(2)]
         # h = font_obj.get_height()
         (w, h) = lines[0].get_size()
-        stamp = pygame.Surface((2*w, 2*h+2))
+        w2 = lines[1].get_width()
+        stamp = pygame.Surface((max(w, w2)+4, 2*h+4))
         stamp.fill(SKY_BLUE)
         stamp.set_colorkey(SKY_BLUE)
         stamp.blit(lines[0], (h+8, 0))
-        stamp.blit(lines[1], (0, h))
+        stamp.blit(lines[1], (2, h))
         
         return stamp
     
@@ -125,14 +126,13 @@ class ScoreBoard(pygame.sprite.Sprite):
         self.image = self.get_stamp(self.myfont, self.message)
     
     def scale(self, i):       
-        self.rect.move_ip((-40, 10))
-        # self.rect.inflate_ip((90, 24))
-        # self.image = pygame.Surface(self.rect.size)
-        # self.image.fill(SKY_BLUE)
-        # self.image.set_colorkey(SKY_BLUE)
+        
         self.myfont = pygame.font.SysFont('cambria', 24+i)
         self.image = self.get_stamp(self.myfont, self.message)
-        
+        i_size = self.image.get_size()
+        pygame.draw.rect(self.image, (250, 120, 20), pygame.Rect((2,2), [i -4 for i in i_size]), 2)
+        self.rect.move_ip((-40, 10))
+        self.rect.size = i_size
 
 
 class Projectiles(pygame.sprite.Group):

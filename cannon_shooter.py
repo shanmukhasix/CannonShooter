@@ -59,8 +59,14 @@ enemies = Targets()
 #bullets from cannon
 bullets = Projectiles()
 
-with open("records.txt") as f:
-    high_score = list(f)[1].strip("\n")     #Read highscore from file.
+try:
+    with open("records.txt", 'r+') as f:
+        high_score = list(f)[1].strip("\n")     #Read highscore from file.
+except FileNotFoundError:
+    with open("records.txt", 'w+') as f:
+        f.write('high_score:\n0')
+        high_score = "0"
+    print("Creating record file")
 
 done = False
 charge = 0
