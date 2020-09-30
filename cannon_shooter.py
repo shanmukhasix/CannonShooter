@@ -1,7 +1,7 @@
 """A simple Shooting game using pygame libraries"""
 
 #in-built modules
-import sys
+
 #3rd party modules  
 import pygame
 #local modules
