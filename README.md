@@ -10,6 +10,8 @@ It contains a cannon and flying enemies (mosqutioes). Score will be increased ev
 
 [Download Game here](https://github.com/shanmukhasix/CannonShooter/archive/master.zip)
 
+**After Downloading, run 'cannon_shooter.py'. Enjoy.**
+
 ![Screenshot](/images/Screenshot1.png)
 
 **Credits:** Sounds from [freesound](https://freesound.org)
