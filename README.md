@@ -10,7 +10,9 @@ It contains a cannon and flying enemies (mosqutioes). Score will be increased ev
 
 [Download Game here (~3 MB)](https://github.com/shanmukhasix/CannonShooter/archive/master.zip)  
 
-**After Downloading, run 'cannon_shooter' file. Enjoy.**
+**After Downloading, run 'cannon_shooter' file.**
+
+Press and release space bar to shoot cannon balls. The speed of the shot depends on how long the space bar was pressed (shown at the base of cannon). Don't let the mosquitoes pass the cannon. **Enjoy**
 
 ![Screenshot](/images/Screenshot1.png)
 
