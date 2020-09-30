@@ -82,6 +82,9 @@ while not done:
     for s in enemies.sprites():
         if s.rect[0] < 0:
             done = True
+            game_over(screen, background, scenary)
+            enemies.empty()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -113,7 +116,6 @@ while not done:
     #This tracks fps
     pygame.time.delay(40)
     
-game_over(screen, background, scenary)
 
 with open("records.txt", 'r+') as f:
     f.seek(13)
