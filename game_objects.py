@@ -8,7 +8,7 @@ import pygame
 # from MyPyGames import my_graphics
 
 SKY_BLUE = (72, 203, 247)
-g_accel = 2.3 #acceleration due to gravity
+G_ACCEL = 1.8 #acceleration due to gravity
 
 
 pygame.init()       #just for caution
@@ -93,9 +93,6 @@ class Cannon(pygame.sprite.Sprite):
             self.level.fill((150, 150, 150))
         self.image.blit(self.level, (30, 130))
     
-    # def draw(self, screen):
-        # screen.blit(self.image, self.rect)
-        # screen.blit(self.level, (80, 480))
 
 class ScoreBoard(pygame.sprite.Sprite):
     """ maintains and prints current score and high score"""
@@ -160,22 +157,34 @@ class CannonBall(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, (30, 30, 30), (10, 10), 8)
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = pygame.Rect(self.init_pos, self.ball_size)
-        self.init_vel = [8, 3]    #Acc to conventional coordinates.
-        self.init_vel = [int(i*charge_level*0.1) for i in self.init_vel]
+        self.vel = [9, -3]    
+        self.vel = [int(i*charge_level*0.1) for i in self.vel]
         self.time = 0
     
     def path(self, time):
-        x = self.init_pos[0] + self.init_vel[0]*time
-        y = self.init_pos[1] - self.init_vel[1]*time + 0.5*g_accel*(time**2)
+        # WIND_RESISTANCE = 0.0000000000000000001 #0 for no air-resistance and one means nothing will ever move 
+        x = self.rect.left + self.vel[0]
+        y = self.rect.top + self.vel[1]
+        # self.vel[0] = self.vel[0] - WIND_RESISTANCE
+        self.vel[1] += G_ACCEL*time
         trajectory = [int(x), int(y)]
         return trajectory
+        
     def update(self):
         if self.rect.bottom < 630 and self.rect.right < screen_size[0]:
-            self.rect = pygame.Rect(self.path(self.time), self.ball_size)
             self.time += 1
+            self.rect = pygame.Rect(self.path(self.time), self.ball_size)
         else:
             self.kill()
-
+    
+    # def kill(self):
+        # if self.rect.bottom < 630 and self.rect.right < screen_size[0]:     #This is a collision.
+            # self.vel[0] = -0.1*self.vel[0]
+            # self.vel[1] = 0.3
+            # self.time = 0
+        # else:
+            # super().kill()                                            # This is out of bounds true death.
+            
 class Targets(pygame.sprite.Group):
     """
     simple group for cannon targets.
@@ -183,7 +192,7 @@ class Targets(pygame.sprite.Group):
     
     def __init__(self):       
         super().__init__()
-        self.difficulty = 0.025 # determines how fast enemies pop up.
+        self.difficulty = 0.03 # determines how fast enemies pop up.
         self.mosquito_sound = pygame.mixer.Sound("sounds\mosquito.wav")
         self.mosquito_sound.set_volume(0)
         self.mosquito_sound.play(-1)
@@ -194,14 +203,14 @@ class Targets(pygame.sprite.Group):
         
         if random.random() < self.difficulty:
             self.add(Mosquito())   
-        crash = len(pygame.sprite.groupcollide(projectile_group, self, False, True, pygame.sprite.collide_mask))
+        crash = len(pygame.sprite.groupcollide(projectile_group, self, True, True, pygame.sprite.collide_mask))
         #remember to not add () to callback function name.
         v = len(self)
         if v > 10:
             v = 10
         self.mosquito_sound.set_volume(v*0.1)
         if self.difficulty < 1.0:
-            self.difficulty += crash*0.0001
+            self.difficulty += crash*0.001
             # print(self.difficulty)
         # print(v)
         super().update(self.difficulty)
@@ -242,7 +251,7 @@ class Mosquito(pygame.sprite.Sprite):
         #since graphics has reversed y direction, there is a -ve before cos to get a counter clock wise rotation
         instant_vel = [int(self.radius*self.rotat_speed*i) for i in instant_vel]
         self.rect.move_ip(instant_vel)
-        self.rect.move_ip((-(1 + int(difficulty*3)), 0))      #linear motion.
+        self.rect.move_ip((-(2 + int(difficulty*10)), 0))      #linear motion.
         # if self.rect.bottom > 640:
             # self.rect.move_ip((0, -8))
         # if random.random() < 0.4:
