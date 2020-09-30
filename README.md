@@ -8,7 +8,9 @@ It contains a cannon and flying enemies (mosqutioes). Score will be increased ev
 2. Since this game uses modules from pygame, you need to download pygame module from pip. For Windows, just copy paste below line in command prompt  
 >pip install pygame
 
-[Download Game here](https://github.com/shanmukhasix/CannonShooter/archive/master.zip)
+[Download Game here (~3 MB)](https://github.com/shanmukhasix/CannonShooter/archive/master.zip)  
+
+**After Downloading, run 'cannon_shooter.py' file. Enjoy.**
 
 ![Screenshot](/images/Screenshot1.png)
 
