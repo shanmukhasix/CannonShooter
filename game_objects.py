@@ -8,7 +8,7 @@ import pygame
 # from MyPyGames import my_graphics
 
 SKY_BLUE = (72, 203, 247)
-G_ACCEL = 1.8 #acceleration due to gravity
+G_ACCEL = 1.6 #acceleration due to gravity
 
 
 pygame.init()       #just for caution
@@ -157,8 +157,8 @@ class CannonBall(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, (30, 30, 30), (10, 10), 8)
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = pygame.Rect(self.init_pos, self.ball_size)
-        self.vel = [9, -3]    
-        self.vel = [int(i*charge_level*0.1) for i in self.vel]
+        self.vel = [7, -3]    
+        self.vel = [int(i*charge_level*0.13) for i in self.vel]
         self.time = 0
     
     def path(self, time):
