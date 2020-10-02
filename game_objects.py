@@ -8,12 +8,12 @@ import pygame
 # from MyPyGames import my_graphics
 
 SKY_BLUE = (72, 203, 247)
-G_ACCEL = 1.6 #acceleration due to gravity
+G_ACCEL = 2.3 #acceleration due to gravity
+SCREEN_SIZE = (1280, 720)
 
 
 pygame.init()       #just for caution
 
-screen_size = (1280, 720)
 
 
 #Abandoned idea
@@ -61,7 +61,7 @@ class Cloud(pygame.sprite.Sprite):
         self.y = int(180 - random.random()*170)
         self.image = pygame.image.load("images\cloud.bmp")
         self.image.set_colorkey(0x6bb0cf)
-        self.rect = pygame.Rect((screen_size[0] - 15 - forward*self.image.get_size()[0], self.y),(self.image.get_size()))
+        self.rect = pygame.Rect((SCREEN_SIZE[0] - 15 - forward*self.image.get_size()[0], self.y),(self.image.get_size()))
        
     def update(self, *args):
         """Slowly drifts the cloud towards left side
@@ -110,7 +110,7 @@ class ScoreBoard(pygame.sprite.Sprite):
         # h = font_obj.get_height()
         (w, h) = lines[0].get_size()
         w2 = lines[1].get_width()
-        stamp = pygame.Surface((max(w, w2)+4, 2*h+4))
+        stamp = pygame.Surface((max(w, w2)+ h + 8, 2*h+4))
         stamp.fill(SKY_BLUE)
         stamp.set_colorkey(SKY_BLUE)
         stamp.blit(lines[0], (h+8, 0))
@@ -158,27 +158,25 @@ class CannonBall(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = pygame.Rect(self.init_pos, self.ball_size)
         self.vel = [7, -3]    
-        self.vel = [int(i*charge_level*0.13) for i in self.vel]
+        self.vel = [int(i*charge_level*0.11) for i in self.vel]
         self.time = 0
     
     def path(self, time):
-        # WIND_RESISTANCE = 0.0000000000000000001 #0 for no air-resistance and one means nothing will ever move 
         x = self.rect.left + self.vel[0]
         y = self.rect.top + self.vel[1]
-        # self.vel[0] = self.vel[0] - WIND_RESISTANCE
         self.vel[1] += G_ACCEL*time
         trajectory = [int(x), int(y)]
         return trajectory
         
     def update(self):
-        if self.rect.bottom < 630 and self.rect.right < screen_size[0]:
+        if self.rect.bottom < 630 and self.rect.right < SCREEN_SIZE[0]:
             self.time += 1
             self.rect = pygame.Rect(self.path(self.time), self.ball_size)
         else:
             self.kill()
     
     # def kill(self):
-        # if self.rect.bottom < 630 and self.rect.right < screen_size[0]:     #This is a collision.
+        # if self.rect.bottom < 630 and self.rect.right < SCREEN_SIZE[0]:     #This is a collision.
             # self.vel[0] = -0.1*self.vel[0]
             # self.vel[1] = 0.3
             # self.time = 0
@@ -192,7 +190,7 @@ class Targets(pygame.sprite.Group):
     
     def __init__(self):       
         super().__init__()
-        self.difficulty = 0.03 # determines how fast enemies pop up.
+        self.difficulty = 0.015 # determines how fast enemies pop up.
         self.mosquito_sound = pygame.mixer.Sound("sounds\mosquito.wav")
         self.mosquito_sound.set_volume(0)
         self.mosquito_sound.play(-1)
@@ -203,6 +201,8 @@ class Targets(pygame.sprite.Group):
         
         if random.random() < self.difficulty:
             self.add(Mosquito())   
+        if random.random() < 0.1*self.difficulty:
+            self.add(Rat())
         crash = len(pygame.sprite.groupcollide(projectile_group, self, True, True, pygame.sprite.collide_mask))
         #remember to not add () to callback function name.
         v = len(self)
@@ -230,7 +230,7 @@ class Mosquito(pygame.sprite.Sprite):
         self.image.set_colorkey(SKY_BLUE)   
         self.size = self.image.get_size()
         self.mask = pygame.mask.from_surface(self.image)
-        available_area = [[250, screen_size[0] - self.size[0]], [120, 630 - self.size[1]]]
+        available_area = [[250, SCREEN_SIZE[0] - self.size[0]], [120, 630 - self.size[1]]]
         available_radius = [abs(center_pos[i] - available_area[i][j]) for i in range(2) for j in range(2)]
         
         self.radius = int((min(available_radius))*(1 - 0.6*random.random()))
@@ -238,13 +238,7 @@ class Mosquito(pygame.sprite.Sprite):
         self.rect = pygame.Rect((center_pos[0] + self.radius, center_pos[1]), self.size)
         self.angle = 0
         self.rotat_speed = 0.7 - random.random()*0.6  #radians per frame
-    
-    # def shadow(self, background):
-        # """ """
-        # x = int(self.rect[0]*640/self.rect[1])
-        # width = int(self.rect.width*640/self.rect[1])
-        # pygame.draw.line(background, (66, 66, 66),(x, 640), (x + width, 640), 3)
-    
+        
     def update(self, difficulty):
         self.angle = (self.angle + self.rotat_speed)%(2*pi)
         instant_vel = [-sin(self.angle), -cos(self.angle)]   
@@ -265,3 +259,18 @@ class Mosquito(pygame.sprite.Sprite):
         splash.play()
         # print("mosquito dead")
         super().kill()
+
+class Rat(pygame.sprite.Sprite):
+    def __init__(self):
+        self.image = pygame.image.load("images\house_rat.bmp")
+        self.image.set_colorkey((255, 255, 255))
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = pygame.Rect((1000, 605), self.image.get_size())
+        self.sound = pygame.mixer.Sound("sounds\squeak.ogg")
+        self.sound.set_volume(1)
+        self.sound.play()
+        super().__init__()
+        
+    def update(self, difficulty):
+        self.rect.move_ip((-6 - 0.2*difficulty, 0))
+        

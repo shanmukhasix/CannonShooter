@@ -5,7 +5,7 @@
 #3rd party modules  
 import pygame
 #local modules
-from game_objects import screen_size, SKY_BLUE, BackgroundEffects, Targets, Projectiles
+from game_objects import SCREEN_SIZE, SKY_BLUE, BackgroundEffects, Targets, Projectiles
 
 pygame.init()
 
@@ -20,12 +20,12 @@ def get_background():
     background: pygame.Surface object
     """
     
-    background = pygame.Surface(screen_size)
+    background = pygame.Surface(SCREEN_SIZE)
     background.fill(SKY_BLUE)
     #green strip
-    background.fill((65, 242, 34), pygame.Rect((0, 640), (screen_size[0], screen_size[1] - 640)))
+    background.fill((65, 242, 34), pygame.Rect((0, 640), (SCREEN_SIZE[0], SCREEN_SIZE[1] - 640)))
     #brown soil
-    # background.fill((184, 95, 7), pygame.Rect((0, 650), (screen_size[0], 150)))        
+    # background.fill((184, 95, 7), pygame.Rect((0, 650), (SCREEN_SIZE[0], 150)))        
     #Drawing Mountains and Sun
     pygame.draw.polygon(background, (150, 150, 150), [(100, 640), (300, 200), (500, 640)])
     pygame.draw.polygon(background, (128, 128, 128), [(400, 640), (550, 175), (700, 640)]) 
@@ -39,7 +39,7 @@ def game_over(screen, background, bge_group):
     sound.play()
     # bge_group.cannon.kill()
     for i in range(22):
-        # stamp = pygame.Surface(screen_size)
+        # stamp = pygame.Surface(SCREEN_SIZE)
         bge_group.score_board.scale(4*i+1)
         bge_group.clear(screen, background)
         bge_group.draw(screen)
@@ -47,7 +47,7 @@ def game_over(screen, background, bge_group):
         pygame.time.delay(250)
         
 
-screen = pygame.display.set_mode(screen_size)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("cannon shooter")
 
 background = get_background()
