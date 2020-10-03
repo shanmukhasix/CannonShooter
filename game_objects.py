@@ -158,7 +158,7 @@ class CannonBall(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = pygame.Rect(self.init_pos, self.ball_size)
         self.vel = [7, -3]    
-        self.vel = [int(i*charge_level*0.11) for i in self.vel]
+        self.vel = [int(i*charge_level*0.12) for i in self.vel]
         self.time = 0
     
     def path(self, time):
@@ -169,7 +169,7 @@ class CannonBall(pygame.sprite.Sprite):
         return trajectory
         
     def update(self):
-        if self.rect.bottom < 630 and self.rect.right < SCREEN_SIZE[0]:
+        if self.rect.bottom < 640 and self.rect.right < SCREEN_SIZE[0]:
             self.time += 1
             self.rect = pygame.Rect(self.path(self.time), self.ball_size)
         else:
@@ -190,7 +190,7 @@ class Targets(pygame.sprite.Group):
     
     def __init__(self):       
         super().__init__()
-        self.difficulty = 0.015 # determines how fast enemies pop up.
+        self.difficulty = 0.01 # determines how fast enemies pop up.
         self.mosquito_sound = pygame.mixer.Sound("sounds\mosquito.wav")
         self.mosquito_sound.set_volume(0)
         self.mosquito_sound.play(-1)
@@ -201,7 +201,7 @@ class Targets(pygame.sprite.Group):
         
         if random.random() < self.difficulty:
             self.add(Mosquito())   
-        if random.random() < 0.1*self.difficulty:
+        if random.random() < self.difficulty**2:
             self.add(Rat())
         crash = len(pygame.sprite.groupcollide(projectile_group, self, True, True, pygame.sprite.collide_mask))
         #remember to not add () to callback function name.
@@ -237,7 +237,7 @@ class Mosquito(pygame.sprite.Sprite):
         # print(self.radius, "-----",available_radius)
         self.rect = pygame.Rect((center_pos[0] + self.radius, center_pos[1]), self.size)
         self.angle = 0
-        self.rotat_speed = 0.7 - random.random()*0.6  #radians per frame
+        self.rotat_speed = 0.6 - random.random()*0.5  #radians per frame
         
     def update(self, difficulty):
         self.angle = (self.angle + self.rotat_speed)%(2*pi)
@@ -246,12 +246,7 @@ class Mosquito(pygame.sprite.Sprite):
         instant_vel = [int(self.radius*self.rotat_speed*i) for i in instant_vel]
         self.rect.move_ip(instant_vel)
         self.rect.move_ip((-(2 + int(difficulty*10)), 0))      #linear motion.
-        # if self.rect.bottom > 640:
-            # self.rect.move_ip((0, -8))
-        # if random.random() < 0.4:
-            # self.rect.move_ip((-4, 0))
-        # elif random.random() < 0.01:
-            # self.rect.move_ip(0, 1)
+        
     
     def kill(self):
         splash = pygame.mixer.Sound("sounds\splash.wav")
@@ -264,13 +259,13 @@ class Rat(pygame.sprite.Sprite):
     def __init__(self):
         self.image = pygame.image.load("images\house_rat.bmp")
         self.image.set_colorkey((255, 255, 255))
-        self.mask = pygame.mask.from_surface(self.image)
         self.rect = pygame.Rect((1000, 605), self.image.get_size())
+        self.mask = pygame.mask.from_surface(self.image)
         self.sound = pygame.mixer.Sound("sounds\squeak.ogg")
         self.sound.set_volume(1)
         self.sound.play()
         super().__init__()
         
     def update(self, difficulty):
-        self.rect.move_ip((-6 - 0.2*difficulty, 0))
+        self.rect.move_ip((int(-3 - 10*difficulty), 0))
         

@@ -7,10 +7,6 @@ import pygame
 #local modules
 from game_objects import SCREEN_SIZE, SKY_BLUE, BackgroundEffects, Targets, Projectiles
 
-pygame.init()
-
-
-
 
 def get_background():
     """Creating background picture
@@ -46,79 +42,85 @@ def game_over(screen, background, bge_group):
         pygame.display.update()
         pygame.time.delay(250)
         
+def main():
+    """ Start of script. This should only be run when the module is called directly."""
+    pygame.init()
 
-screen = pygame.display.set_mode(SCREEN_SIZE)
-pygame.display.set_caption("cannon shooter")
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_caption("cannon shooter")
+    #obtaining background
+    background = get_background()
+    screen.blit(background, (0,0))
+    #clouds,etc
+    scenary = BackgroundEffects()
+    # mosquitoes
+    enemies = Targets()
+    #bullets from cannon
+    bullets = Projectiles()
 
-background = get_background()
-screen.blit(background, (0,0))
-#clouds,etc
-scenary = BackgroundEffects()
-# mosquitoes
-enemies = Targets()
-#bullets from cannon
-bullets = Projectiles()
+    try:
+        with open("records.txt", 'r+') as f:
+            high_score = list(f)[1].strip("\n")     #Read highscore from file.
+    except FileNotFoundError:
+        with open("records.txt", 'w+') as f:
+            f.write('high_score:\n0')
+            high_score = "0"
+        print("Creating record file")
 
-try:
-    with open("records.txt", 'r+') as f:
-        high_score = list(f)[1].strip("\n")     #Read highscore from file.
-except FileNotFoundError:
-    with open("records.txt", 'w+') as f:
-        f.write('high_score:\n0')
-        high_score = "0"
-    print("Creating record file")
+    done = False
+    charge = 0
+    score = 0
+    flag = False
 
-done = False
-charge = 0
-score = 0
-flag = False
+    while not done:
+        #this is input processing part of game loop.
+        if flag == True:        #flag stores True if specific keys are pressed and held.
+            charge += 5 
+            # print(charge)
+            charge = charge%100
+        for s in enemies.sprites():
+            if s.rect[0] < 0:
+                done = True
+                game_over(screen, background, scenary)
+                enemies.empty()
 
-while not done:
-    #this is input processing part of game loop.
-    if flag == True:        #flag stores True if specific keys are pressed and held.
-        charge += 5 
-        # print(charge)
-        charge = charge%100
-    for s in enemies.sprites():
-        if s.rect[0] < 0:
-            done = True
-            game_over(screen, background, scenary)
-            enemies.empty()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key in [pygame.K_SPACE, pygame.K_KP_ENTER]:
+                    # print("space bar is pressed")
+                    flag = True
+            elif event.type == pygame.KEYUP:
+                if event.key in [pygame.K_SPACE, pygame.K_KP_ENTER]:
+                    bullets.add_ammo(1, charge)
+                    flag = False
+                    charge = 0
+        #This updates game
+        if int(high_score) < score:
+            high_score = str(score)
+            
+        scenary.update(cannon_charge_level = charge, high_score = high_score, score = score)
+        bullets.update()
+        score += enemies.update(bullets)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key in [pygame.K_SPACE, pygame.K_KP_ENTER]:
-                # print("space bar is pressed")
-                flag = True
-        elif event.type == pygame.KEYUP:
-            if event.key in [pygame.K_SPACE, pygame.K_KP_ENTER]:
-                bullets.add_ammo(1, charge)
-                flag = False
-                charge = 0
-    #This updates game
-    if int(high_score) < score:
-        high_score = str(score)
+        #Rendering part of the loop
+        enemies.clear(screen, background)
+        bullets.clear(screen, background)
+        scenary.clear(screen, background)
+        scenary.draw(screen)
+        enemies.draw(screen)
+        bullets.draw(screen)
+        pygame.display.update() 
+        #This tracks fps
+        pygame.time.delay(40)
         
-    scenary.update(cannon_charge_level = charge, high_score = high_score, score = score)
-    bullets.update()
-    score += enemies.update(bullets)
 
-    #Rendering part of the loop
-    enemies.clear(screen, background)
-    bullets.clear(screen, background)
-    scenary.clear(screen, background)
-    scenary.draw(screen)
-    enemies.draw(screen)
-    bullets.draw(screen)
-    pygame.display.update() 
-    #This tracks fps
-    pygame.time.delay(40)
-    
+    with open("records.txt", 'r+') as f:
+        f.seek(13)
+        f.write(high_score)
 
-with open("records.txt", 'r+') as f:
-    f.seek(13)
-    f.write(high_score)
+    pygame.quit()
 
-pygame.quit()
+if __name__ == "__main__":
+    main()
