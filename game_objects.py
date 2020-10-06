@@ -8,7 +8,7 @@ import pygame
 # from MyPyGames import my_graphics
 
 SKY_BLUE = (72, 203, 247)
-G_ACCEL = 2.3 #acceleration due to gravity
+G_ACCEL = 2.8 #acceleration due to gravity
 SCREEN_SIZE = (1280, 720)
 
 
@@ -163,16 +163,17 @@ class CannonBall(pygame.sprite.Sprite):
     
     def path(self, time):
         x = self.rect.left + self.vel[0]
-        y = self.rect.top + self.vel[1]
-        self.vel[1] += G_ACCEL*time
+        y = self.init_pos[1] + self.vel[1]*self.time + 0.5*G_ACCEL*(self.time**2)
+        # self.vel[1] += G_ACCEL*time
         trajectory = [int(x), int(y)]
         return trajectory
         
     def update(self):
-        if self.rect.bottom < 640 and self.rect.right < SCREEN_SIZE[0]:
+        if self.rect.bottom < SCREEN_SIZE[1] and self.rect.right < SCREEN_SIZE[0]:
             self.time += 1
             self.rect = pygame.Rect(self.path(self.time), self.ball_size)
         else:
+            # print('cannonball is at', self.rect.topleft)
             self.kill()
     
     # def kill(self):
@@ -268,4 +269,10 @@ class Rat(pygame.sprite.Sprite):
         
     def update(self, difficulty):
         self.rect.move_ip((int(-3 - 10*difficulty), 0))
+        
+    def kill(self):
+        splash = pygame.mixer.Sound("sounds\splash.wav")
+        splash.set_volume(0.7)
+        splash.play()
+        super().kill()
         
